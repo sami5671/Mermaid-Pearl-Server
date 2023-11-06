@@ -26,6 +26,19 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    // =========================Creating the database========================================
+    const allRoomsCollection = client.db("mermaidHotel").collection("rooms");
+    // =================================================================================================
+
+    // =====================================Get the room data============================================================
+    app.get("/room", async (req, res) => {
+      const cursor = allRoomsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // =================================================================================================
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
