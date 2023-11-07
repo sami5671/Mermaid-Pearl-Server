@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -31,13 +31,33 @@ async function run() {
     const allRoomsCollection = client.db("mermaidHotel").collection("rooms");
     // =================================================================================================
 
-    // =====================================Get the room data============================================================
+    // =====================================Get the rooms data============================================================
     app.get("/room", async (req, res) => {
       const cursor = allRoomsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
 
+    // ================================================================
+    app.get("/roomdetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = {
+        projection: {
+          name: 1,
+          description: 1,
+          price: 1,
+          availability: 1,
+          image1: 1,
+          image2: 1,
+          image3: 1,
+          image4: 1,
+          specialoffer: 1,
+        },
+      };
+      const result = await allRoomsCollection.findOne(query, options);
+      res.send(result);
+    });
     // =================================================================================================
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
