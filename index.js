@@ -29,6 +29,9 @@ async function run() {
 
     // =========================Creating the database========================================
     const allRoomsCollection = client.db("mermaidHotel").collection("rooms");
+    const roomBookingsCollection = client
+      .db("mermaidHotel")
+      .collection("bookings");
     // =================================================================================================
 
     // =====================================Get the rooms data============================================================
@@ -38,7 +41,7 @@ async function run() {
       res.send(result);
     });
 
-    // ================================================================
+    // =======================get a room info=========================================
     app.get("/roomdetails/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -56,6 +59,33 @@ async function run() {
         },
       };
       const result = await allRoomsCollection.findOne(query, options);
+      res.send(result);
+    });
+    // ======================get a book room info==========================================
+    app.get("/book/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = {
+        projection: {
+          name: 1,
+          description: 1,
+          price: 1,
+          availability: 1,
+          image1: 1,
+          image2: 1,
+          image3: 1,
+          image4: 1,
+          specialoffer: 1,
+        },
+      };
+      const result = await allRoomsCollection.findOne(query, options);
+      res.send(result);
+    });
+
+    // ================================post booking info =================================================================
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+      const result = await roomBookingsCollection.insertOne(booking);
       res.send(result);
     });
     // =================================================================================================
