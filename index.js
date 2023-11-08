@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
@@ -32,6 +33,15 @@ async function run() {
     const roomBookingsCollection = client
       .db("mermaidHotel")
       .collection("bookings");
+
+    // ==================================auth apis===============================================================
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, "secret", { expiresIn: "1h" });
+      res.send(token);
+    });
+
     // =================================================================================================
 
     // =====================================Get the rooms data============================================================
@@ -111,7 +121,7 @@ async function run() {
           status: updatedBooking.status,
         },
       };
-      const result = await bookingCollection.updateOne(filter, updateDoc);
+      const result = await roomBookingsCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
