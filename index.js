@@ -88,6 +88,40 @@ async function run() {
       const result = await roomBookingsCollection.insertOne(booking);
       res.send(result);
     });
+    // ================================get user specific booking info =================================================================
+    app.get("/bookings", async (req, res) => {
+      console.log(req.query.email);
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const cursor = roomBookingsCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // ========================update booking confirmation===============================
+    app.patch("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedBooking = req.body;
+      console.log(updatedBooking);
+
+      const updateDoc = {
+        $set: {
+          status: updatedBooking.status,
+        },
+      };
+      const result = await bookingCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    // =================delete a booking info================================================
+    app.delete("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await roomBookingsCollection.deleteOne(query);
+      res.send(result);
+    });
     // =================================================================================================
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
