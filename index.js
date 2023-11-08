@@ -88,6 +88,91 @@ async function run() {
       res.send(result);
     });
 
+    // ========================get a booking room info=========================================
+    // ===================update a booking room info ==============================================
+    app.get("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = {
+        projection: {
+          CustomerName: 1,
+          name: 1,
+          email: 1,
+          checkIn: 1,
+          checkOut: 1,
+          description: 1,
+          price: 1,
+          availability: 1,
+          image1: 1,
+          image2: 1,
+          image3: 1,
+          image4: 1,
+          specialoffer: 1,
+        },
+      };
+      const result = await roomBookingsCollection.findOne(query, options);
+      res.send(result);
+    });
+
+    // app.put("/bookings/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const filter = { _id: new ObjectId(id) };
+    //   const options = { upsert: true };
+    //   const updateBookingRoom = req.body;
+
+    //   console.log("Received id:", id);
+    //   console.log("Received update data:", updateBookingRoom);
+
+    //   const BookingRoom = {
+    //     $set: {
+    //       CustomerName: updateBookingRoom.Cname,
+    //       // Add other fields here
+    //     },
+    //   };
+
+    //   const result = await roomBookingsCollection.updateOne(
+    //     filter,
+    //     BookingRoom,
+    //     options
+    //   );
+
+    //   console.log("Update result:", result);
+
+    //   res.send(result);
+    // });
+
+    // app.put("/bookings/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const filter = { _id: new ObjectId(id) };
+    //   const options = { upsert: true };
+    //   const updateBookingRoom = req.body;
+
+    //   const BookingRoom = {
+    //     $set: {
+    //       CustomerName: updateBookingRoom.Cname,
+    //       name: updateBookingRoom.name,
+    //       email: updateBookingRoom.email,
+    //       checkIn: updateBookingRoom.date1,
+    //       checkOut: updateBookingRoom.date2,
+    //       price: updateBookingRoom.price,
+    //       description: updateBookingRoom.description,
+    //       image1: updateBookingRoom.image1,
+    //       image2: updateBookingRoom.image2,
+    //       image3: updateBookingRoom.image3,
+    //       image4: updateBookingRoom.image4,
+    //       specialoffer: updateBookingRoom.specialoffer,
+    //     },
+    //   };
+    //   const result = await roomBookingsCollection.updateOne(
+    //     filter,
+    //     BookingRoom,
+    //     options
+    //   );
+    //   console.log(result);
+    //   res.send(result);
+    // });
+    // =================================================================
+
     // =======================get a room info=========================================
     app.get("/roomdetails/:id", async (req, res) => {
       const id = req.params.id;
@@ -138,6 +223,11 @@ async function run() {
     // ================================get user specific booking info =================================================================
     app.get("/bookings", logger, verifyToken, async (req, res) => {
       console.log(req.query.email);
+      // --------------------------------------
+      if (req.user.email !== req.query.email) {
+        return res.status(403).send({ message: "Forbidden access" });
+      }
+      // ---------------------------------
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email };
@@ -156,6 +246,8 @@ async function run() {
       const updateDoc = {
         $set: {
           status: updatedBooking.status,
+          checkIn: updatedBooking.date1,
+          checkOut: updatedBooking.date2,
         },
       };
       const result = await roomBookingsCollection.updateOne(filter, updateDoc);
