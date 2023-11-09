@@ -7,16 +7,23 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
-// middlewares
-app.use(express.json());
+// =========================middlewares============================
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      // "http://localhost:5173",
+      "https://mermaid-hotel.web.app",
+      "https://mermaid-hotel.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
-app.use(cookieParser());
+
 // =================================================================
+app.use(cookieParser());
+app.use(express.json());
+// =================================================================
+
 // ==========================custom middleware =======================================
 const logger = (req, res, next) => {
   console.log("log: info: ", req.method, req.url);
